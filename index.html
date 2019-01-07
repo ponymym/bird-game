@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #game{
+            width: 800px;
+            height: 600px;
+            background: url('./images/sky.png');
+            position: relative;
+            overflow:hidden;
+        }
+        #bird{
+            width: 34px;
+            height: 25px;
+            background: url('./images/birds.png') -10px -8px no-repeat;
+            position: absolute;
+            top: 100px;
+            left: 100px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div id="bird">
+
+        </div>
+    </div>
+    <script>
+        var game = document.getElementById('game');
+        var bird = document.getElementById('bird');
+        var sky = {
+            x:0
+        }
+        var birdo = {
+            speedX:5,
+            speedY:0,
+            x: bird.offsetLeft,
+            y: bird.offsetTop
+        }
+
+        var running=true;
+
+        setInterval(function(){
+            if(running){
+              sky.x += 5;
+              game.style.backgroundPositionX=-sky.x+'px';
+              birdo.speedY +=1;
+              birdo.y += birdo.speedY;
+              if(birdo.y<=0){
+                  running=false;
+                  birdo.y=0;
+              }
+              if(birdo.y>=600-25){
+                  running=false;
+                  birdo.y=575;
+              }
+            }
+            bird.style.top = birdo.y + 'px';
+        },30)
+
+        document.onclick=function(){
+            birdo.speedY=-10;
+        }
+
+        //创建管道
+        function createPipe(position){
+            var pipe={};
+            pipe.x=position;
+            //规定上管道的高度 假设200-300之间
+            pipe.uHeight=150+parseInt(Math.random()*100);
+            pipe.dHeight=600-pipe.uHeight-200;
+            pipe.dTop=pipe.uHeight+200;
+            console.log(pipe.uHeight);
+            console.log(pipe.dTop);
+            console.log(pipe.dHeight);
+
+
+            var uPipe=document.createElement('div')
+            uPipe.style.width='52px';
+            uPipe.style.height=pipe.uHeight+'px';
+            uPipe.style.background='url(./images/pipe2.png) no-repeat center bottom';
+            uPipe.style.position='absolute';
+            uPipe.style.top=0;
+            uPipe.style.left=pipe.x+'px';
+            game.appendChild(uPipe);
+
+            //下管道
+            var dPipe=document.createElement('div')
+            dPipe.style.width='52px';
+            dPipe.style.height=pipe.dHeight+'px';
+            dPipe.style.background='url("./images/pipe1.png") no-repeat center top';
+            dPipe.style.position='absolute';
+            dPipe.style.top=pipe.dTop+'px';
+            dPipe.style.left=pipe.x+'px';
+            game.appendChild(dPipe);
+
+            //让管道运动起来
+            setInterval(function(){
+               if(running){
+                    pipe.x -= 2;
+                    dPipe.style.left=pipe.x+'px';
+                    uPipe.style.left=pipe.x+'px';
+                    if(pipe.x<-52){
+                        pipe.x=800;
+                    }
+
+                    //碰到上下柱子游戏结束
+                    var utouch = (birdo.x + 34 >pipe.x) && (birdo.x <pipe.x + 52) && (birdo.y<pipe.uHeight);
+                    var dtouch = (birdo.x + 34 >pipe.x) && (birdo.x <pipe.x + 52) && (birdo.y+25>pipe.uHeight+200);
+                    if(utouch){
+                        running=false;
+                    }
+                    if(dtouch){
+                        running=false;
+                        birdo.y=pipe.dTop-25;
+
+                    }
+                }
+             },30)
+        }
+
+        createPipe(400);
+        createPipe(600);
+        createPipe(800);
+        createPipe(1000);
+    </script>
+</body>
+</html>
